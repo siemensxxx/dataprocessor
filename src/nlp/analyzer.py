@@ -1,0 +1,64 @@
+from transformers import pipeline
+import torch
+import logging
+from typing import List, Any
+
+logger = logging.getLogger(__name__)
+
+class NLPAnalyzer:
+    def __init__(self, batch_size: int = 32, use_gpu: bool = True):
+        self.batch_size = batch_size
+        self.device = torch.device("cuda" if torch.cuda.is_available() and use_gpu else "cpu")
+        
+        logger.info(f"Initializing NLP models on {self.device}")
+        self.sentiment_analyzer = pipeline(
+            "sentiment-analysis",
+            model="distilbert-base-uncased-finetuned-sst-2-english",
+            device=0 if torch.cuda.is_available() and use_gpu else -1,
+            batch_size=self.batch_size
+        )
+        
+        self.intent_classifier = pipeline(
+            "zero-shot-classification",
+            model="facebook/bart-large-mnli",
+            device=0 if torch.cuda.is_available() and use_gpu else -1,
+            batch_size=self.batch_size
+        )
+
+    def detect_intent(self, text: str) -> str:
+        """Detect the intent of the text using zero-shot classification"""
+        if not text.strip():
+            return "unknown"
+            
+        try:
+            result = self.intent_classifier(
+                text,
+                candidate_labels=["question", "opinion", "answer", "discussion"],
+                hypothesis_template="This text is expressing a {}."
+            )
+            return result['labels'][0]
+        except Exception as e:
+            logger.warning(f"Error detecting intent: {e}")
+            return "unknown"
+    
+    def analyze_sentiment(self, text: str) -> float:
+        """Analyze the sentiment of the text"""
+        if not text.strip():
+            return 0.0
+            
+        try:
+            result = self.sentiment_analyzer(text)
+            score = result[0]['score']
+            return score if result[0]['label'] == 'POSITIVE' else -score
+        except Exception as e:
+            logger.warning(f"Error analyzing sentiment: {e}")
+            return 0.0
+
+    def process_batch(self, texts: List[str], processor_fn) -> List[Any]:
+        """Process a batch of texts using the specified processor function"""
+        results = []
+        for i in range(0, len(texts), self.batch_size):
+            batch = texts[i:i + self.batch_size]
+            batch_results = [processor_fn(text) for text in batch]
+            results.extend(batch_results)
+        return results
