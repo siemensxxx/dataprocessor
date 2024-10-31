@@ -25,7 +25,7 @@ class GPUOptimizedProcessor:
                  posts_file: str, 
                  comments_file: str, 
                  output_dir: str, 
-                 batch_size: int = 32,
+                 batch_size: int = 256,
                  chunk_size: int = 1000):
         """
         Initialize the Reddit data processor optimized for GPU processing.

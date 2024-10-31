@@ -7,7 +7,7 @@ from typing import List, Any
 logger = logging.getLogger(__name__)
 
 class NLPAnalyzer:
-    def __init__(self, batch_size: int = 32, use_gpu: bool = True):
+    def __init__(self, batch_size: int = 64, use_gpu: bool = True):
         self.batch_size = batch_size
         self.device = torch.device("cuda" if torch.cuda.is_available() and use_gpu else "cpu")
         
