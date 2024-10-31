@@ -18,9 +18,8 @@ rich>=13.0.0  # For better console output
 # Type checking
 typing-extensions>=4.5.0  # For advanced type hints
 
-# Date handling
+# Date handli
 python-dateutil>=2.8.2
 
-# Optional but recommended for better performance
 ujson>=5.7.0  # Faster JSON processing
 numba>=0.57.0  # For numerical computations
