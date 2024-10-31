@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import List
+from typing import Dict, List
 
 @dataclass
 class RedditComment:
