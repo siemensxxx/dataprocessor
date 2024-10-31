@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import List
-from typing import Dict, List
+from typing import dict, List
 
 @dataclass
 class RedditComment:
@@ -17,9 +17,9 @@ class RedditComment:
     intent: str = None
     sentiment: float = None
      # New topic-related fields
-    topics: List[Dict[str, float]] = field(default_factory=list)  # List of {topic_id: probability} mappings
+    topics: List[dict[str, float]] = field(default_factory=list)  # List of {topic_id: probability} mappings
     dominant_topic: Optional[int] = None  # ID of the topic with highest probability
-    topic_probabilities: Dict[int, float] = field(default_factory=dict)  # Full topic distribution
+    topic_probabilities: dict[int, float] = field(default_factory=dict)  # Full topic distribution
 
 
 @dataclass
@@ -39,8 +39,8 @@ class RedditPost:
     intent: str = None
     sentiment: float = None
      # New topic-related fields
-    topics: List[Dict[str, float]] = field(default_factory=list)  # List of {topic_id: probability} mappings
-    title_topics: List[Dict[str, float]] = field(default_factory=list)  # Topic distribution for title
-    content_topics: List[Dict[str, float]] = field(default_factory=list)  # Topic distribution for content
+    topics: List[dict[str, float]] = field(default_factory=list)  # List of {topic_id: probability} mappings
+    title_topics: List[dict[str, float]] = field(default_factory=list)  # Topic distribution for title
+    content_topics: List[dict[str, float]] = field(default_factory=list)  # Topic distribution for content
     dominant_topic: Optional[int] = None  # ID of the topic with highest probability
-    topic_probabilities: Dict[int, float] = field(default_factory=dict)  # Full topic distribution
+    topic_probabilities: dict[int, float] = field(default_factory=dict)  # Full topic distribution
