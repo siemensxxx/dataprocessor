@@ -10,6 +10,8 @@ from dataclasses import asdict
 import torch
 from tqdm import tqdm
 import gc
+from .nlp.topic_modeling import TopicModeler
+
 
 from .data.data_loader import DataLoader
 from .nlp.analyzer import NLPAnalyzer
@@ -26,7 +28,7 @@ class GPUOptimizedProcessor:
                  comments_file: str, 
                  output_dir: str, 
                  batch_size: int = 256,
-                 chunk_size: int = 1000):
+                 chunk_size: int = 2000):
         """
         Initialize the Reddit data processor optimized for GPU processing.
         
@@ -250,6 +252,47 @@ class GPUOptimizedProcessor:
             'processed_posts.json'
         )
 
+    def _analyze_language_style(self):
+        """Analyze language style and common phrases"""
+        logger.info("Analyzing language style and common phrases...")
+        
+        # Initialize language analyzer
+        language_analyzer = LanguageStyleAnalyzer(
+            min_phrase_freq=3,
+            max_ngram_size=3
+        )
+        
+        # Combine post and comment texts
+        texts = []
+        
+        # Add post texts
+        for post in self.processed_posts:
+            if post.title:
+                texts.append(post.title)
+            if post.content:
+                texts.append(post.content)
+                
+        # Add comment texts
+        for comment in self.processed_comments:
+            if comment.content:
+                texts.append(comment.content)
+        
+        # Analyze content
+        language_analyzer.analyze_content(texts)
+        
+        # Save results
+        language_analyzer.save_results(
+            self.output_dir / 'language_analysis.json'
+        )
+        
+        # Log summary statistics
+        stats = language_analyzer.get_summary_statistics()
+        logger.info("Language analysis summary:")
+        logger.info(f"Total unique phrases: {stats['total_unique_phrases']}")
+        logger.info(f"Total slang terms: {stats['total_slang_terms']}")
+        logger.info(f"Total sentence patterns: {stats['total_sentence_patterns']}")
+
+
     def process_data(self):
         """
         Main method to process the Reddit data with GPU optimization.
@@ -272,12 +315,15 @@ class GPUOptimizedProcessor:
             
             # Process comments
             self.processed_comments = self._process_comments(raw_comments)
-            
+            self._analyze_language_style()
+            self._extract_topics()
             # Create conversation pairs
             conversation_pairs = self._create_conversation_pairs()
             
             # Split and save data
             self._split_and_save_data(conversation_pairs)
+            
+            
             
             logger.info("Processing completed successfully!")
             
