@@ -6,11 +6,14 @@ import pandas as pd
 from pathlib import Path
 from typing import List, Dict, Any, Generator, Iterator, Optional
 from sklearn.model_selection import train_test_split
-from dataclasses import asdict
+from dataclasses import asdict, dataclass, field
+
 import torch
 from tqdm import tqdm
 import gc
 from .nlp.topic_modeling import TopicModeler
+import psutil
+
 
 
 from .data.data_loader import DataLoader
@@ -20,15 +23,228 @@ from .processors.comment_processor import CommentProcessor
 from .processors.conversation_processor import ConversationProcessor
 from .models.data_classes import RedditPost, RedditComment
 
+import logging
+import json
+import pandas as pd
+from pathlib import Path
+from typing import List, Dict, Any, Generator, Iterator, Optional
+from sklearn.model_selection import train_test_split
+from dataclasses import asdict
+import torch
+from tqdm import tqdm
+import gc
+from datetime import datetime
+import time
+from .nlp.topic_modeling import TopicModeler
+from .nlp.analyzer import NLPAnalyzer
+from .data.data_loader import DataLoader
+from .processors.post_processor import PostProcessor
+from .processors.comment_processor import CommentProcessor
+from .processors.conversation_processor import ConversationProcessor
+from .models.data_classes import RedditPost, RedditComment
+import sys
+from rich.progress import (
+    Progress,
+    TimeElapsedColumn,
+    TimeRemainingColumn,
+    SpinnerColumn,
+    BarColumn,
+    TextColumn
+)
+from rich.console import Console
+from rich.logging import RichHandler
+from rich.table import Table
+
 logger = logging.getLogger(__name__)
+
+
+
+def setup_logging(output_dir: Path) -> logging.Logger:
+    """Configure enhanced logging with rich handler and file output"""
+    log_file = output_dir / f"processing_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+    
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s | %(levelname)s | %(message)s",
+        handlers=[
+            RichHandler(rich_tracebacks=True, console=console),
+            logging.FileHandler(log_file)
+        ]
+    )
+    
+    return logging.getLogger(__name__)
+
+class PerformanceMetrics:
+    cpu_percent: float = 0.0
+    memory_percent: float = 0.0
+    gpu_utilization: Optional[float] = None
+    gpu_memory_used: Optional[float] = None
+    timestamp: datetime = field(default_factory=datetime.now)
+
+class ProcessingStats:
+    """Track processing statistics, timing, and system performance"""
+    def __init__(self):
+        self.start_time = time.time()
+        self.operation_times = {}
+        self.operation_counts = {}
+        self.errors = []
+        self.warnings = []
+        self.performance_history: List[PerformanceMetrics] = []
+        self.monitoring_interval = 1.0  # seconds
+        self.last_monitored = time.time()
+        
+    def _get_gpu_metrics(self) -> tuple[Optional[float], Optional[float]]:
+        """Get GPU utilization and memory usage if available"""
+        if torch.cuda.is_available():
+            try:
+                gpu_util = torch.cuda.utilization()
+                gpu_mem = torch.cuda.memory_allocated() / torch.cuda.max_memory_allocated() * 100
+                return gpu_util, gpu_mem
+            except:
+                return None, None
+        return None, None
+
+    def update_performance_metrics(self):
+        """Update performance metrics if monitoring interval has elapsed"""
+        current_time = time.time()
+        if current_time - self.last_monitored >= self.monitoring_interval:
+            gpu_util, gpu_mem = self._get_gpu_metrics()
+            metrics = PerformanceMetrics(
+                cpu_percent=psutil.cpu_percent(),
+                memory_percent=psutil.virtual_memory().percent,
+                gpu_utilization=gpu_util,
+                gpu_memory_used=gpu_mem
+            )
+            self.performance_history.append(metrics)
+            self.last_monitored = current_time
+        
+    def start_operation(self, operation_name: str):
+        """Start timing an operation and record initial performance metrics"""
+        self.operation_times[operation_name] = {
+            'start': time.time(),
+            'start_metrics': PerformanceMetrics(
+                cpu_percent=psutil.cpu_percent(),
+                memory_percent=psutil.virtual_memory().percent,
+                *self._get_gpu_metrics()
+            )
+        }
+        
+    def end_operation(self, operation_name: str, success: bool = True):
+        """End timing an operation and record final performance metrics"""
+        if operation_name in self.operation_times:
+            end_time = time.time()
+            duration = end_time - self.operation_times[operation_name]['start']
+            self.operation_times[operation_name].update({
+                'duration': duration,
+                'success': success,
+                'end_metrics': PerformanceMetrics(
+                    cpu_percent=psutil.cpu_percent(),
+                    memory_percent=psutil.virtual_memory().percent,
+                    *self._get_gpu_metrics()
+                )
+            })
+            
+    def get_performance_summary(self) -> Dict:
+        """Generate summary of performance metrics"""
+        if not self.performance_history:
+            return {}
+            
+        cpu_percentages = [m.cpu_percent for m in self.performance_history]
+        memory_percentages = [m.memory_percent for m in self.performance_history]
+        gpu_utils = [m.gpu_utilization for m in self.performance_history if m.gpu_utilization is not None]
+        gpu_mems = [m.gpu_memory_used for m in self.performance_history if m.gpu_memory_used is not None]
+        
+        return {
+            'cpu': {
+                'avg': sum(cpu_percentages) / len(cpu_percentages),
+                'max': max(cpu_percentages),
+                'min': min(cpu_percentages)
+            },
+            'memory': {
+                'avg': sum(memory_percentages) / len(memory_percentages),
+                'max': max(memory_percentages),
+                'min': min(memory_percentages)
+            },
+            'gpu': {
+                'avg_utilization': sum(gpu_utils) / len(gpu_utils) if gpu_utils else None,
+                'max_utilization': max(gpu_utils) if gpu_utils else None,
+                'avg_memory': sum(gpu_mems) / len(gpu_mems) if gpu_mems else None,
+                'max_memory': max(gpu_mems) if gpu_mems else None
+            }
+        }
+
+    def generate_report(self) -> Dict:
+        """Generate comprehensive processing report including performance metrics"""
+        total_duration = time.time() - self.start_time
+        
+        return {
+            'total_duration': total_duration,
+            'operations': self.operation_times,
+            'error_count': len(self.errors),
+            'warning_count': len(self.warnings),
+            'errors': self.errors,
+            'warnings': self.warnings,
+            'performance': self.get_performance_summary()
+        }
+
+class ProcessingStats:
+    """Track processing statistics and timing"""
+    def __init__(self):
+        self.start_time = time.time()
+        self.operation_times = {}
+        self.operation_counts = {}
+        self.errors = []
+        self.warnings = []
+        
+    def start_operation(self, operation_name: str):
+        """Start timing an operation"""
+        self.operation_times[operation_name] = {'start': time.time()}
+        
+    def end_operation(self, operation_name: str, success: bool = True):
+        """End timing an operation and record statistics"""
+        if operation_name in self.operation_times:
+            end_time = time.time()
+            duration = end_time - self.operation_times[operation_name]['start']
+            self.operation_times[operation_name]['duration'] = duration
+            self.operation_times[operation_name]['success'] = success
+            
+    def add_error(self, operation: str, error: str):
+        """Record an error"""
+        self.errors.append({
+            'timestamp': datetime.now(),
+            'operation': operation,
+            'error': error
+        })
+        
+    def add_warning(self, operation: str, warning: str):
+        """Record a warning"""
+        self.warnings.append({
+            'timestamp': datetime.now(),
+            'operation': operation,
+            'warning': warning
+        })
+        
+    def generate_report(self) -> Dict:
+        """Generate comprehensive processing report"""
+        total_duration = time.time() - self.start_time
+        
+        return {
+            'total_duration': total_duration,
+            'operations': self.operation_times,
+            'error_count': len(self.errors),
+            'warning_count': len(self.warnings),
+            'errors': self.errors,
+            'warnings': self.warnings
+        }
+
 
 class GPUOptimizedProcessor:
     def __init__(self, 
                  posts_file: str, 
                  comments_file: str, 
                  output_dir: str, 
-                 batch_size: int = 256,
-                 chunk_size: int = 2000):
+                 batch_size: int = 32,
+                 chunk_size: int = 1000):
         """
         Initialize the Reddit data processor optimized for GPU processing.
         
@@ -294,17 +510,8 @@ class GPUOptimizedProcessor:
 
 
     def process_data(self):
-        """
-        Main method to process the Reddit data with GPU optimization.
-        
-        This method orchestrates the entire processing pipeline:
-        1. Loads raw data
-        2. Processes posts and comments
-        3. Creates conversation pairs
-        4. Splits into train/test sets
-        5. Saves all processed data
-        """
         try:
+            stats = ProcessingStats()
             logger.info("Starting data processing with GPU optimization...")
             
             # Load raw data
@@ -315,23 +522,32 @@ class GPUOptimizedProcessor:
             
             # Process comments
             self.processed_comments = self._process_comments(raw_comments)
+            
+            # Analyze language style
             self._analyze_language_style()
+            
+            # Extract topics
             self._extract_topics()
+            
             # Create conversation pairs
             conversation_pairs = self._create_conversation_pairs()
             
             # Split and save data
             self._split_and_save_data(conversation_pairs)
             
-            
+            # Update performance metrics
+            stats.update_performance_metrics()
             
             logger.info("Processing completed successfully!")
-            
+        
         except Exception as e:
             logger.error(f"Error processing data: {e}")
             raise
+        
         finally:
             self._cleanup_gpu_memory()
+
+
 
     def get_processing_stats(self) -> Dict[str, Any]:
         """Get statistics about the processed data"""
