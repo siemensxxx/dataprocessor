@@ -11,6 +11,8 @@ from nltk.corpus import stopwords
 import spacy
 import pandas as pd
 from tqdm import tqdm
+import nltk
+
 
 logger = logging.getLogger(__name__)
 

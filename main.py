@@ -3,6 +3,8 @@ from src.data_processor import GPUOptimizedProcessor
 import torch
 import nltk
 nltk.download('stopwords')
+nltk.download('words')
+
 
 logging.basicConfig(
     level=logging.INFO,

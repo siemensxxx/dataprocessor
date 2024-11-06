@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import List, Dict, Any, Generator, Iterator, Optional
 from sklearn.model_selection import train_test_split
 from dataclasses import asdict, dataclass, field
+import nltk
+
 
 import torch
 from tqdm import tqdm
