@@ -550,6 +550,60 @@ class GPUOptimizedProcessor:
         
         finally:
             self._cleanup_gpu_memory()
+            
+    def _extract_topics(self):
+        """Extracts topics from the processed posts and comments."""
+        logger.info("Starting topic extraction...")
+        
+        # Instantiate the topic modeler with LDA (or NMF) parameters
+        topic_modeler = TopicModeler(
+            method='lda',         # You can switch to 'nmf' if desired
+            n_topics=10,          # Set the number of topics you want
+            max_features=10000    # Set max features based on your text data
+        )
+        
+        # Collect text data for topic extraction (posts + comments)
+        texts = []
+        for post in self.processed_posts:
+            if post.content:
+                texts.append(post.content)
+            if post.title:
+                texts.append(post.title)
+        for comment in self.processed_comments:
+            if comment.content:
+                texts.append(comment.content)
+
+        # Step 1: Preprocess and transform texts for topic modeling
+        try:
+            document_topic_matrix = topic_modeler.fit_transform(texts)
+        except Exception as e:
+            logger.error(f"Error during topic modeling: {e}")
+            return
+        
+        # Step 2: Retrieve and structure the topics with top terms
+        try:
+            topic_terms = topic_modeler.get_topic_terms(n_terms=10)  # Get top terms for each topic
+            topic_summary = topic_modeler.get_topic_summary(n_terms=10)
+            
+            # Log summary for review
+            for idx, topic in enumerate(topic_summary):
+                logger.info(f"Topic {idx + 1}: {', '.join([term['term'] for term in topic['terms']])}")
+
+            # Save topic summaries to a JSON file
+            summary_path = self.output_dir / "topic_summary.json"
+            with open(summary_path, "w") as f:
+                json.dump(topic_summary, f, indent=2)
+            logger.info(f"Topic summaries saved to {summary_path}")
+
+            # Save document-topic matrix to CSV
+            dtm_path = self.output_dir / "document_topic_matrix.csv"
+            pd.DataFrame(document_topic_matrix).to_csv(dtm_path, index=False)
+            logger.info(f"Document-topic matrix saved to {dtm_path}")
+
+        except Exception as e:
+            logger.error(f"Error saving topic results: {e}")
+
+        logger.info("Topic extraction completed successfully.")
 
 
 
