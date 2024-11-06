@@ -109,7 +109,7 @@ class ProcessingStats:
         return None, None
 
     def update_performance_metrics(self):
-        """Update performance metrics if monitoring interval has elapsed"""
+        """Update performance metrics if monitoring interval has elapsed."""
         current_time = time.time()
         if current_time - self.last_monitored >= self.monitoring_interval:
             gpu_util, gpu_mem = self._get_gpu_metrics()
