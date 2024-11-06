@@ -22,6 +22,8 @@ from .processors.post_processor import PostProcessor
 from .processors.comment_processor import CommentProcessor
 from .processors.conversation_processor import ConversationProcessor
 from .models.data_classes import RedditPost, RedditComment
+from .nlp.language_analyzer import LanguageStyleAnalyzer
+
 
 import logging
 import json
