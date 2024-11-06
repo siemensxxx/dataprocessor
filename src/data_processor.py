@@ -451,7 +451,6 @@ class GPUOptimizedProcessor:
         )
         return self.conversation_processor.create_conversation_pairs(self.posts_dict)
     
-    logger.info(f"Number of conversation pairs: {len(conversation_pairs)}")
 
     def _split_and_save_data(self, conversation_pairs):
         """Split data into train/test sets and save if non-empty."""
@@ -551,6 +550,7 @@ class GPUOptimizedProcessor:
             stats.update_performance_metrics()
             
             logger.info("Processing completed successfully!")
+            logger.info(f"Number of conversation pairs: {len(conversation_pairs)}")
         
         except Exception as e:
             logger.error(f"Error processing data: {e}")
