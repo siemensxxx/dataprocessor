@@ -450,27 +450,35 @@ class GPUOptimizedProcessor:
             self.processed_comments
         )
         return self.conversation_processor.create_conversation_pairs(self.posts_dict)
+    
+    logger.info(f"Number of conversation pairs: {len(conversation_pairs)}")
 
-    def _split_and_save_data(self, conversation_pairs: List[Dict]):
-        """Split data into train/test sets and save"""
-        logger.info("Splitting and saving data...")
-        train_pairs, test_pairs = train_test_split(
-            conversation_pairs,
-            test_size=0.2,
-            random_state=42
-        )
-        
-        # Save training data
-        self.save_to_file(train_pairs, 'train_conversations.csv')
-        
-        # Save test data
-        self.save_to_file(test_pairs, 'test_conversations.csv')
-        
-        # Save processed posts
-        self.save_to_file(
-            [asdict(post) for post in self.processed_posts],
-            'processed_posts.json'
-        )
+    def _split_and_save_data(self, conversation_pairs):
+        """Split data into train/test sets and save if non-empty."""
+        if not conversation_pairs:
+            logger.warning("No conversation pairs available. Skipping train/test split and save.")
+            return
+
+        try:
+            # Perform train-test split
+            train_pairs, test_pairs = train_test_split(
+                conversation_pairs,
+                test_size=0.2,
+                random_state=42
+            )
+
+            # Save training data
+            train_path = self.output_dir / 'train_conversations.csv'
+            pd.DataFrame(train_pairs).to_csv(train_path, index=False)
+            logger.info(f"Training data saved to {train_path}")
+
+            # Save test data
+            test_path = self.output_dir / 'test_conversations.csv'
+            pd.DataFrame(test_pairs).to_csv(test_path, index=False)
+            logger.info(f"Test data saved to {test_path}")
+
+        except ValueError as e:
+            logger.error(f"Error splitting conversation pairs: {e}")
 
     def _analyze_language_style(self):
         """Analyze language style and common phrases"""
