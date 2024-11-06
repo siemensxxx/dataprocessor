@@ -108,7 +108,7 @@ class ProcessingStats:
                 return None, None
         return None, None
 
-    def update_performance_metrics(self):
+    #def update_performance_metrics(self):
         """Update performance metrics if monitoring interval has elapsed."""
         current_time = time.time()
         if current_time - self.last_monitored >= self.monitoring_interval:
@@ -547,7 +547,7 @@ class GPUOptimizedProcessor:
             self._split_and_save_data(conversation_pairs)
             
             # Update performance metrics
-            stats.update_performance_metrics()
+            #stats.update_performance_metrics()
             
             logger.info("Processing completed successfully!")
             logger.info(f"Number of conversation pairs: {len(conversation_pairs)}")
