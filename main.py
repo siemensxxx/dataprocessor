@@ -1,6 +1,8 @@
 import logging
 from src.data_processor import GPUOptimizedProcessor
 import torch
+import nltk
+nltk.download('stopwords')
 
 logging.basicConfig(
     level=logging.INFO,
