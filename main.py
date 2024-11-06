@@ -4,7 +4,7 @@ import torch
 import nltk
 nltk.download('stopwords')
 nltk.download('words')
-
+nltk.download('punkt_tab')
 
 logging.basicConfig(
     level=logging.INFO,
