@@ -35,8 +35,7 @@ class CommentProcessor:
             # Add intent and sentiment analysis
             if cleaned_content:
                 comment.intent = self.nlp_analyzer.detect_intent(cleaned_content)
-                comment.sentiment = self.nlp_analyzer.analyze_sentiment(cleaned_content)
-                
+                                
             return comment
         except Exception as e:
             logger.error(f"Error processing comment {comment_data.get('name', 'unknown')}: {e}")

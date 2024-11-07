@@ -17,12 +17,6 @@ class NLPAnalyzer:
         self.tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
         self.max_length = 512  # Maximum sequence length for the model
         
-        self.sentiment_analyzer = pipeline(
-            "sentiment-analysis",
-            model="distilbert-base-uncased-finetuned-sst-2-english",
-            device=0 if torch.cuda.is_available() and use_gpu else -1,
-            batch_size=self.batch_size
-        )
         
         self.intent_classifier = pipeline(
             "zero-shot-classification",
@@ -57,19 +51,6 @@ class NLPAnalyzer:
             logger.warning(f"Error detecting intent: {e}")
             return "unknown"
     
-    def analyze_sentiment(self, text: str) -> float:
-        """Analyze the sentiment of the text"""
-        if not text.strip():
-            return 0.0
-            
-        try:
-            truncated_text = self._truncate_text(text)
-            result = self.sentiment_analyzer(truncated_text)
-            score = result[0]['score']
-            return score if result[0]['label'] == 'POSITIVE' else -score
-        except Exception as e:
-            logger.warning(f"Error analyzing sentiment: {e}")
-            return 0.0
 
     def process_batch(self, texts: List[str], processor_fn) -> List[Any]:
         """Process a batch of texts using the specified processor function"""

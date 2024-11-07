@@ -37,7 +37,6 @@ class PostProcessor:
             # Add intent and sentiment analysis
             if cleaned_content:
                 post.intent = self.nlp_analyzer.detect_intent(cleaned_content)
-                post.sentiment = self.nlp_analyzer.analyze_sentiment(cleaned_content)
                 
             return post
         except Exception as e:

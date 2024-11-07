@@ -14,7 +14,6 @@ class RedditComment:
     score: int
     edited: bool
     intent: str = None
-    sentiment: float = None
      # New topic-related fields
     topics: List[dict[str, float]] = field(default_factory=list)  # List of {topic_id: probability} mappings
     dominant_topic: Optional[int] = None  # ID of the topic with highest probability
@@ -36,7 +35,6 @@ class RedditPost:
     edited: bool
     comments: List[RedditComment] = field(default_factory=list)
     intent: str = None
-    sentiment: float = None
      # New topic-related fields
     topics: List[dict[str, float]] = field(default_factory=list)  # List of {topic_id: probability} mappings
     title_topics: List[dict[str, float]] = field(default_factory=list)  # Topic distribution for title
