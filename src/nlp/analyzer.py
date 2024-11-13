@@ -130,7 +130,7 @@ class RedditDataAnalyzer:
         MAX_DEPTH = 10
 
         def traverse_tree(node, parent_embedding, depth=0):
-            if depth > MAX_DEPTH:
+            if depth > MAX_DEPTH or not hasattr(node, 'comments'):
                 return
             for comment in node.comments:
                 comment_embedding = self.embed_content(comment.content)
@@ -140,9 +140,6 @@ class RedditDataAnalyzer:
                     'similarity_to_parent': similarity
                 })
                 traverse_tree(comment, comment_embedding, depth + 1)
-
-        traverse_tree(tree, root_embedding)
-        return conversation_flow
 
     def visualize_clusters(self, embeddings, labels):
         reducer = umap.UMAP(n_components=2, random_state=42)
