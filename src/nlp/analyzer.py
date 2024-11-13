@@ -114,7 +114,11 @@ class RedditDataAnalyzer:
         text = " ".join(filtered_words)
 
         vectorizer = TfidfVectorizer(ngram_range=(1, 2), max_features=5)
-        tfidf_matrix = vectorizer.fit_transform([text])
+        if text.strip():
+            tfidf_matrix = vectorizer.fit_transform([text])
+        else:
+            # Handle the case where the text is empty
+            print("Text is empty, skipping TF-IDF processing.")
         feature_names = vectorizer.get_feature_names_out()
         phrase_scores = tfidf_matrix.toarray()[0]
         key_phrases = [phrase for phrase, score in zip(feature_names, phrase_scores) if score > 0]
