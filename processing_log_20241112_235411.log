@@ -1,0 +1,33 @@
+2024-11-12 23:54:11,395 - __main__ - INFO - CUDA available: False
+2024-11-12 23:54:11,395 - src.data.data_loader - INFO - Loading posts from data/gettingbigger_submissions.json
+2024-11-12 23:54:11,398 - src.data.data_loader - INFO - Loading comments from data/gettingbigger_comments.json
+2024-11-12 23:54:11,400 - src.data.data_loader - INFO - Loaded 10 posts and 20 comments
+2024-11-12 23:54:15,192 - src.data_processor - WARNING - GPU not available, falling back to CPU
+2024-11-12 23:54:15,193 - src.nlp.analyzer - INFO - Initializing NLP models on cpu
+2024-11-12 23:54:16,929 - src.data_processor - INFO - Starting data processing with GPU optimization...
+2024-11-12 23:54:16,929 - src.data.data_loader - INFO - Loading posts from data/gettingbigger_submissions.json
+2024-11-12 23:54:16,930 - src.data.data_loader - INFO - Loading comments from data/gettingbigger_comments.json
+2024-11-12 23:54:16,930 - src.data.data_loader - INFO - Loaded 10 posts and 20 comments
+2024-11-12 23:54:16,930 - src.data_processor - INFO - Processing posts...
+2024-11-12 23:54:33,824 - src.data_processor - INFO - Processing comments...
+2024-11-12 23:54:33,829 - src.data_processor - INFO - Creating conversation pairs...
+2024-11-12 23:54:33,861 - src.data_processor - INFO - Training data saved to processed_data/train_conversations.csv
+2024-11-12 23:54:33,862 - src.data_processor - INFO - Test data saved to processed_data/test_conversations.csv
+2024-11-12 23:54:33,862 - src.data_processor - INFO - Processing completed successfully!
+2024-11-12 23:54:33,862 - src.data_processor - INFO - Number of conversation pairs: 20
+2024-11-12 23:54:34,144 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: mps
+2024-11-12 23:54:34,144 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-mpnet-base-v2
+2024-11-12 23:54:40,050 - src.nlp.analyzer - INFO - Cluster 2: ['it', 'make', 'product', 'products', 'so']
+2024-11-12 23:54:40,051 - src.nlp.analyzer - INFO - Cluster 0: []
+2024-11-12 23:54:40,051 - src.nlp.analyzer - INFO - Cluster 4: ['love', 'one', 'posts', 'said', 'year']
+2024-11-12 23:54:40,051 - src.nlp.analyzer - INFO - Cluster 3: ['benefits', 'benefits noticed', 'longer', 'longer thicker', 'manhood']
+2024-11-12 23:54:40,051 - src.nlp.analyzer - INFO - Cluster 5: ['also', 'much maximum', 'pe', 'pe question', 'question']
+2024-11-12 23:54:40,051 - src.nlp.analyzer - INFO - Cluster 1: ['almost', 'beg', 'mseg', 'putting condom', 'smaller']
+2024-11-12 23:54:52,059 - __main__ - INFO - Processing statistics:
+2024-11-12 23:54:52,059 - __main__ - INFO - - total_posts: 10
+2024-11-12 23:54:52,059 - __main__ - INFO - - total_comments: 20
+2024-11-12 23:54:52,059 - __main__ - INFO - - gpu_available: False
+2024-11-12 23:54:52,059 - __main__ - INFO - - gpu_name: None
+2024-11-12 23:54:52,059 - __main__ - INFO - - batch_size: 128
+2024-11-12 23:54:52,059 - __main__ - INFO - - chunk_size: 1000
+2024-11-12 23:54:52,059 - __main__ - INFO - - posts_with_comments: 1

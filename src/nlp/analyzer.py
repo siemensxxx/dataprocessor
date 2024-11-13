@@ -109,19 +109,32 @@ class RedditDataAnalyzer:
         return multi_labels
 
     def extract_key_phrases(self, text):
+        # Ensure the text is not empty before processing
+        if not text.strip():
+            print("Text is empty, skipping TF-IDF processing.")
+            return []  # Return an empty list if no valid text is available
+
+        # Tokenize the words and filter out stop words
         words = word_tokenize(text)
         filtered_words = [w for w in words if w not in self.stop_words and w.isalnum()]
+        
+        # Join the filtered words back into a single string
         text = " ".join(filtered_words)
-
+        
+        if not text.strip():  # Check if the filtered text is empty
+            print("Filtered text is empty, skipping TF-IDF processing.")
+            return []  # Return an empty list if filtered text is empty
+        
+        # Apply TF-IDF Vectorization
         vectorizer = TfidfVectorizer(ngram_range=(1, 2), max_features=5)
-        if text.strip():
-            tfidf_matrix = vectorizer.fit_transform([text])
-        else:
-            # Handle the case where the text is empty
-            print("Text is empty, skipping TF-IDF processing.")
+        tfidf_matrix = vectorizer.fit_transform([text])
+        
         feature_names = vectorizer.get_feature_names_out()
         phrase_scores = tfidf_matrix.toarray()[0]
+        
+        # Get key phrases with a non-zero score
         key_phrases = [phrase for phrase, score in zip(feature_names, phrase_scores) if score > 0]
+        
         return key_phrases
 
     def analyze_conversation_tree(self, post_id: str):
