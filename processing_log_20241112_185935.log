@@ -1,0 +1,24 @@
+2024-11-12 18:59:37,237 - __main__ - INFO - CUDA available: False
+2024-11-12 18:59:37,237 - src.data.data_loader - INFO - Loading posts from data/gettingbigger_submissions.json
+2024-11-12 18:59:37,239 - src.data.data_loader - INFO - Loading comments from data/gettingbigger_comments.json
+2024-11-12 18:59:37,239 - src.data.data_loader - INFO - Loaded 11 posts and 10 comments
+2024-11-12 18:59:44,232 - src.data_processor - WARNING - GPU not available, falling back to CPU
+2024-11-12 18:59:44,232 - src.nlp.analyzer - INFO - Initializing NLP models on cpu
+2024-11-12 18:59:46,024 - src.data_processor - INFO - Starting data processing with GPU optimization...
+2024-11-12 18:59:46,024 - src.data.data_loader - INFO - Loading posts from data/gettingbigger_submissions.json
+2024-11-12 18:59:46,025 - src.data.data_loader - INFO - Loading comments from data/gettingbigger_comments.json
+2024-11-12 18:59:46,025 - src.data.data_loader - INFO - Loaded 11 posts and 10 comments
+2024-11-12 18:59:46,025 - src.data_processor - INFO - Processing posts...
+2024-11-12 19:00:12,791 - src.data_processor - INFO - Processing comments...
+2024-11-12 19:00:12,795 - src.data_processor - INFO - Creating conversation pairs...
+2024-11-12 19:00:12,795 - src.data_processor - WARNING - No conversation pairs available. Skipping train/test split and save.
+2024-11-12 19:00:12,795 - src.data_processor - INFO - Processing completed successfully!
+2024-11-12 19:00:12,795 - src.data_processor - INFO - Number of conversation pairs: 0
+2024-11-12 19:00:13,038 - __main__ - INFO - Processing statistics:
+2024-11-12 19:00:13,038 - __main__ - INFO - - total_posts: 11
+2024-11-12 19:00:13,038 - __main__ - INFO - - total_comments: 10
+2024-11-12 19:00:13,038 - __main__ - INFO - - gpu_available: False
+2024-11-12 19:00:13,038 - __main__ - INFO - - gpu_name: None
+2024-11-12 19:00:13,038 - __main__ - INFO - - batch_size: 128
+2024-11-12 19:00:13,038 - __main__ - INFO - - chunk_size: 1000
+2024-11-12 19:00:13,038 - __main__ - INFO - - posts_with_comments: 0

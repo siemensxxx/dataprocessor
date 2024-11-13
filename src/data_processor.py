@@ -1,30 +1,10 @@
 # src/data_processor.py
-
-import logging
-import json
-import pandas as pd
-from pathlib import Path
-from typing import List, Dict, Any, Generator, Iterator, Optional
-from sklearn.model_selection import train_test_split
-from dataclasses import asdict, dataclass, field
-import nltk
-
-
-import torch
-from tqdm import tqdm
-import gc
-from .nlp.topic_modeling import TopicModeler
-import psutil
-
-
-
 from .data.data_loader import DataLoader
 from .nlp.analyzer import NLPAnalyzer
 from .processors.post_processor import PostProcessor
 from .processors.comment_processor import CommentProcessor
 from .processors.conversation_processor import ConversationProcessor
 from .models.data_classes import RedditPost, RedditComment
-from .nlp.language_analyzer import LanguageStyleAnalyzer
 
 
 import logging
@@ -39,7 +19,6 @@ from tqdm import tqdm
 import gc
 from datetime import datetime
 import time
-from .nlp.topic_modeling import TopicModeler
 from .nlp.analyzer import NLPAnalyzer
 from .data.data_loader import DataLoader
 from .processors.post_processor import PostProcessor
@@ -47,17 +26,6 @@ from .processors.comment_processor import CommentProcessor
 from .processors.conversation_processor import ConversationProcessor
 from .models.data_classes import RedditPost, RedditComment
 import sys
-from rich.progress import (
-    Progress,
-    TimeElapsedColumn,
-    TimeRemainingColumn,
-    SpinnerColumn,
-    BarColumn,
-    TextColumn
-)
-from rich.console import Console
-from rich.logging import RichHandler
-from rich.table import Table
 
 logger = logging.getLogger(__name__)
 
@@ -78,12 +46,6 @@ def setup_logging(output_dir: Path) -> logging.Logger:
     
     return logging.getLogger(__name__)
 
-class PerformanceMetrics:
-    cpu_percent: float = 0.0
-    memory_percent: float = 0.0
-    gpu_utilization: Optional[float] = None
-    gpu_memory_used: Optional[float] = None
-    timestamp: datetime = field(default_factory=datetime.now)
 
 class ProcessingStats:
     """Track processing statistics, timing, and system performance"""
@@ -93,7 +55,6 @@ class ProcessingStats:
         self.operation_counts = {}
         self.errors = []
         self.warnings = []
-        self.performance_history: List[PerformanceMetrics] = []
         self.monitoring_interval = 1.0  # seconds
         self.last_monitored = time.time()
         
@@ -107,89 +68,6 @@ class ProcessingStats:
             except:
                 return None, None
         return None, None
-
-    #def update_performance_metrics(self):
-        """Update performance metrics if monitoring interval has elapsed."""
-        current_time = time.time()
-        if current_time - self.last_monitored >= self.monitoring_interval:
-            gpu_util, gpu_mem = self._get_gpu_metrics()
-            metrics = PerformanceMetrics(
-                cpu_percent=psutil.cpu_percent(),
-                memory_percent=psutil.virtual_memory().percent,
-                gpu_utilization=gpu_util,
-                gpu_memory_used=gpu_mem
-            )
-            self.performance_history.append(metrics)
-            self.last_monitored = current_time
-        
-    def start_operation(self, operation_name: str):
-        """Start timing an operation and record initial performance metrics"""
-        self.operation_times[operation_name] = {
-            'start': time.time(),
-            'start_metrics': PerformanceMetrics(
-                cpu_percent=psutil.cpu_percent(),
-                memory_percent=psutil.virtual_memory().percent,
-                *self._get_gpu_metrics()
-            )
-        }
-        
-    def end_operation(self, operation_name: str, success: bool = True):
-        """End timing an operation and record final performance metrics"""
-        if operation_name in self.operation_times:
-            end_time = time.time()
-            duration = end_time - self.operation_times[operation_name]['start']
-            self.operation_times[operation_name].update({
-                'duration': duration,
-                'success': success,
-                'end_metrics': PerformanceMetrics(
-                    cpu_percent=psutil.cpu_percent(),
-                    memory_percent=psutil.virtual_memory().percent,
-                    *self._get_gpu_metrics()
-                )
-            })
-            
-    def get_performance_summary(self) -> Dict:
-        """Generate summary of performance metrics"""
-        if not self.performance_history:
-            return {}
-            
-        cpu_percentages = [m.cpu_percent for m in self.performance_history]
-        memory_percentages = [m.memory_percent for m in self.performance_history]
-        gpu_utils = [m.gpu_utilization for m in self.performance_history if m.gpu_utilization is not None]
-        gpu_mems = [m.gpu_memory_used for m in self.performance_history if m.gpu_memory_used is not None]
-        
-        return {
-            'cpu': {
-                'avg': sum(cpu_percentages) / len(cpu_percentages),
-                'max': max(cpu_percentages),
-                'min': min(cpu_percentages)
-            },
-            'memory': {
-                'avg': sum(memory_percentages) / len(memory_percentages),
-                'max': max(memory_percentages),
-                'min': min(memory_percentages)
-            },
-            'gpu': {
-                'avg_utilization': sum(gpu_utils) / len(gpu_utils) if gpu_utils else None,
-                'max_utilization': max(gpu_utils) if gpu_utils else None,
-                'avg_memory': sum(gpu_mems) / len(gpu_mems) if gpu_mems else None,
-                'max_memory': max(gpu_mems) if gpu_mems else None
-            }
-        }
-
-    def generate_report(self) -> Dict:
-        """Generate comprehensive processing report including performance metrics"""
-        total_duration = time.time() - self.start_time
-        
-        return {
-            'total_duration': total_duration,
-            'operations': self.operation_times,
-            'error_count': len(self.errors),
-            'warning_count': len(self.warnings),
-            'errors': self.errors,
-            'warnings': self.warnings,
-            'performance': self.get_performance_summary()
-        }
 
 class ProcessingStats:
     """Track processing statistics and timing"""
@@ -247,7 +125,7 @@ class GPUOptimizedProcessor:
                  posts_file: str, 
                  comments_file: str, 
                  output_dir: str, 
-                 batch_size: int = 32,
+                 batch_size: int = 128,
                  chunk_size: int = 1000):
         """
         Initialize the Reddit data processor optimized for GPU processing.
@@ -479,45 +357,6 @@ class GPUOptimizedProcessor:
         except ValueError as e:
             logger.error(f"Error splitting conversation pairs: {e}")
 
-    def _analyze_language_style(self):
-        """Analyze language style and common phrases"""
-        logger.info("Analyzing language style and common phrases...")
-        
-        # Initialize language analyzer
-        language_analyzer = LanguageStyleAnalyzer(
-            min_phrase_freq=3,
-            max_ngram_size=3
-        )
-        
-        # Combine post and comment texts
-        texts = []
-        
-        # Add post texts
-        for post in self.processed_posts:
-            if post.title:
-                texts.append(post.title)
-            if post.content:
-                texts.append(post.content)
-                
-        # Add comment texts
-        for comment in self.processed_comments:
-            if comment.content:
-                texts.append(comment.content)
-        
-        # Analyze content
-        language_analyzer.analyze_content(texts)
-        
-        # Save results
-        language_analyzer.save_results(
-            self.output_dir / 'language_analysis.json'
-        )
-        
-        # Log summary statistics
-        stats = language_analyzer.get_summary_statistics()
-        logger.info("Language analysis summary:")
-        logger.info(f"Total unique phrases: {stats['total_unique_phrases']}")
-        logger.info(f"Total slang terms: {stats['total_slang_terms']}")
-        logger.info(f"Total sentence patterns: {stats['total_sentence_patterns']}")
 
 
     def process_data(self):
@@ -533,13 +372,7 @@ class GPUOptimizedProcessor:
             
             # Process comments
             self.processed_comments = self._process_comments(raw_comments)
-            
-            # Analyze language style
-            self._analyze_language_style()
-            
-            # Extract topics
-            self._extract_topics()
-            
+                    
             # Create conversation pairs
             conversation_pairs = self._create_conversation_pairs()
             
@@ -547,8 +380,7 @@ class GPUOptimizedProcessor:
             self._split_and_save_data(conversation_pairs)
             
             # Update performance metrics
-            #stats.update_performance_metrics()
-            
+                        
             logger.info("Processing completed successfully!")
             logger.info(f"Number of conversation pairs: {len(conversation_pairs)}")
         
@@ -558,61 +390,7 @@ class GPUOptimizedProcessor:
         
         finally:
             self._cleanup_gpu_memory()
-            
-    def _extract_topics(self):
-        """Extracts topics from the processed posts and comments."""
-        logger.info("Starting topic extraction...")
-        
-        # Instantiate the topic modeler with LDA (or NMF) parameters
-        topic_modeler = TopicModeler(
-            method='lda',         # You can switch to 'nmf' if desired
-            n_topics=10,          # Set the number of topics you want
-            max_features=10000    # Set max features based on your text data
-        )
-        
-        # Collect text data for topic extraction (posts + comments)
-        texts = []
-        for post in self.processed_posts:
-            if post.content:
-                texts.append(post.content)
-            if post.title:
-                texts.append(post.title)
-        for comment in self.processed_comments:
-            if comment.content:
-                texts.append(comment.content)
-
-        # Step 1: Preprocess and transform texts for topic modeling
-        try:
-            document_topic_matrix = topic_modeler.fit_transform(texts)
-        except Exception as e:
-            logger.error(f"Error during topic modeling: {e}")
-            return
-        
-        # Step 2: Retrieve and structure the topics with top terms
-        try:
-            topic_terms = topic_modeler.get_topic_terms(n_terms=10)  # Get top terms for each topic
-            topic_summary = topic_modeler.get_topic_summary(n_terms=10)
-            
-            # Log summary for review
-            for idx, topic in enumerate(topic_summary):
-                logger.info(f"Topic {idx + 1}: {', '.join([term['term'] for term in topic['terms']])}")
-
-            # Save topic summaries to a JSON file
-            summary_path = self.output_dir / "topic_summary.json"
-            with open(summary_path, "w") as f:
-                json.dump(topic_summary, f, indent=2)
-            logger.info(f"Topic summaries saved to {summary_path}")
-
-            # Save document-topic matrix to CSV
-            dtm_path = self.output_dir / "document_topic_matrix.csv"
-            pd.DataFrame(document_topic_matrix).to_csv(dtm_path, index=False)
-            logger.info(f"Document-topic matrix saved to {dtm_path}")
-
-        except Exception as e:
-            logger.error(f"Error saving topic results: {e}")
-
-        logger.info("Topic extraction completed successfully.")
-
+    
 
 
     def get_processing_stats(self) -> Dict[str, Any]:

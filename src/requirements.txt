@@ -28,3 +28,9 @@ scikit-learn>=1.0.0
 scipy>=1.7.0
 nltk 
 spacy
+sentence-transformers>=2.2.0
+umap 
+networkx 
+pyvis 
+hdbscan
+umap-learn

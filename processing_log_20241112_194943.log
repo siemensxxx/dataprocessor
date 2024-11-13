@@ -1,0 +1,25 @@
+2024-11-12 19:49:43,417 - __main__ - INFO - CUDA available: False
+2024-11-12 19:49:43,417 - src.data.data_loader - INFO - Loading posts from data/gettingbigger_submissions.json
+2024-11-12 19:49:43,418 - src.data.data_loader - INFO - Loading comments from data/gettingbigger_comments.json
+2024-11-12 19:49:43,419 - src.data.data_loader - INFO - Loaded 11 posts and 10 comments
+2024-11-12 19:49:46,495 - src.data_processor - WARNING - GPU not available, falling back to CPU
+2024-11-12 19:49:46,495 - src.nlp.analyzer - INFO - Initializing NLP models on cpu
+2024-11-12 19:49:48,192 - src.data_processor - INFO - Starting data processing with GPU optimization...
+2024-11-12 19:49:48,192 - src.data.data_loader - INFO - Loading posts from data/gettingbigger_submissions.json
+2024-11-12 19:49:48,192 - src.data.data_loader - INFO - Loading comments from data/gettingbigger_comments.json
+2024-11-12 19:49:48,192 - src.data.data_loader - INFO - Loaded 11 posts and 10 comments
+2024-11-12 19:49:48,192 - src.data_processor - INFO - Processing posts...
+2024-11-12 19:50:00,271 - src.data_processor - INFO - Processing comments...
+2024-11-12 19:50:00,275 - src.data_processor - INFO - Creating conversation pairs...
+2024-11-12 19:50:00,276 - src.data_processor - WARNING - No conversation pairs available. Skipping train/test split and save.
+2024-11-12 19:50:00,276 - src.data_processor - INFO - Processing completed successfully!
+2024-11-12 19:50:00,276 - src.data_processor - INFO - Number of conversation pairs: 0
+2024-11-12 19:50:00,554 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: mps
+2024-11-12 19:50:00,554 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-mpnet-base-v2
+2024-11-12 19:50:04,597 - src.nlp.analyzer - INFO - Cluster 4: ['80', 'eq', 'morning wood', 'sometimes', 'wood']
+2024-11-12 19:50:04,597 - src.nlp.analyzer - INFO - Cluster 2: ['gains', 'girth', 'inches', 'length', 'pump']
+2024-11-12 19:50:04,597 - src.nlp.analyzer - INFO - Cluster 5: ['7hg', 'fine', 'mustang', 'mustang tube', 'newbee']
+2024-11-12 19:50:04,597 - src.nlp.analyzer - INFO - Cluster 0: ['2023', '2023 gained', 'comment', 'comment 2023', 'gained']
+2024-11-12 19:50:04,597 - src.nlp.analyzer - INFO - Cluster 1: ['after', 'seems', 'seems like', 'sub', 'sub seems']
+2024-11-12 19:50:04,597 - src.nlp.analyzer - INFO - Cluster 3: ['angle', 'hanging', 'is', 'is btc', 'recently']
+2024-11-12 19:50:04,597 - __main__ - ERROR - Error in processing: 'RedditPost' object is not subscriptable

@@ -33,8 +33,8 @@ class CommentProcessor:
             )
             
             # Add intent and sentiment analysis
-            if cleaned_content:
-                comment.intent = self.nlp_analyzer.detect_intent(cleaned_content)
+            #if cleaned_content:
+            #    comment.intent = self.nlp_analyzer.detect_intent(cleaned_content)
                                 
             return comment
         except Exception as e:

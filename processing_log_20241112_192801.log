@@ -1,0 +1,19 @@
+2024-11-12 19:28:01,334 - __main__ - INFO - CUDA available: False
+2024-11-12 19:28:01,335 - src.data.data_loader - INFO - Loading posts from data/gettingbigger_submissions.json
+2024-11-12 19:28:01,336 - src.data.data_loader - INFO - Loading comments from data/gettingbigger_comments.json
+2024-11-12 19:28:01,336 - src.data.data_loader - INFO - Loaded 11 posts and 10 comments
+2024-11-12 19:28:04,364 - src.data_processor - WARNING - GPU not available, falling back to CPU
+2024-11-12 19:28:04,364 - src.nlp.analyzer - INFO - Initializing NLP models on cpu
+2024-11-12 19:28:06,043 - src.data_processor - INFO - Starting data processing with GPU optimization...
+2024-11-12 19:28:06,043 - src.data.data_loader - INFO - Loading posts from data/gettingbigger_submissions.json
+2024-11-12 19:28:06,043 - src.data.data_loader - INFO - Loading comments from data/gettingbigger_comments.json
+2024-11-12 19:28:06,043 - src.data.data_loader - INFO - Loaded 11 posts and 10 comments
+2024-11-12 19:28:06,043 - src.data_processor - INFO - Processing posts...
+2024-11-12 19:28:19,782 - src.data_processor - INFO - Processing comments...
+2024-11-12 19:28:19,784 - src.data_processor - INFO - Creating conversation pairs...
+2024-11-12 19:28:19,784 - src.data_processor - WARNING - No conversation pairs available. Skipping train/test split and save.
+2024-11-12 19:28:19,784 - src.data_processor - INFO - Processing completed successfully!
+2024-11-12 19:28:19,784 - src.data_processor - INFO - Number of conversation pairs: 0
+2024-11-12 19:28:20,086 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: mps
+2024-11-12 19:28:20,086 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-mpnet-base-v2
+2024-11-12 19:28:41,151 - __main__ - ERROR - Error in processing: 'RedditPost' object is not subscriptable

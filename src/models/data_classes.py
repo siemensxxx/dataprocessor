@@ -14,10 +14,12 @@ class RedditComment:
     score: int
     edited: bool
     intent: str = None
-     # New topic-related fields
     topics: List[dict[str, float]] = field(default_factory=list)  # List of {topic_id: probability} mappings
     dominant_topic: Optional[int] = None  # ID of the topic with highest probability
     topic_probabilities: dict[int, float] = field(default_factory=dict)  # Full topic distribution
+    replies: List['RedditComment'] = field(default_factory=list) # List to store replies
+    
+
 
 
 @dataclass
@@ -41,3 +43,6 @@ class RedditPost:
     content_topics: List[dict[str, float]] = field(default_factory=list)  # Topic distribution for content
     dominant_topic: Optional[int] = None  # ID of the topic with highest probability
     topic_probabilities: dict[int, float] = field(default_factory=dict)  # Full topic distribution
+    conversation_analysis: Optional[List[dict[str, any]]] = None # Add field for conversation analysis
+ 
+

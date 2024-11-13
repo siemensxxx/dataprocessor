@@ -1,0 +1,32 @@
+2024-11-12 20:05:13,369 - __main__ - INFO - CUDA available: False
+2024-11-12 20:05:13,369 - src.data.data_loader - INFO - Loading posts from data/gettingbigger_submissions.json
+2024-11-12 20:05:13,371 - src.data.data_loader - INFO - Loading comments from data/gettingbigger_comments.json
+2024-11-12 20:05:13,371 - src.data.data_loader - INFO - Loaded 11 posts and 10 comments
+2024-11-12 20:05:14,474 - src.data_processor - WARNING - GPU not available, falling back to CPU
+2024-11-12 20:05:14,474 - src.nlp.analyzer - INFO - Initializing NLP models on cpu
+2024-11-12 20:05:16,174 - src.data_processor - INFO - Starting data processing with GPU optimization...
+2024-11-12 20:05:16,174 - src.data.data_loader - INFO - Loading posts from data/gettingbigger_submissions.json
+2024-11-12 20:05:16,174 - src.data.data_loader - INFO - Loading comments from data/gettingbigger_comments.json
+2024-11-12 20:05:16,174 - src.data.data_loader - INFO - Loaded 11 posts and 10 comments
+2024-11-12 20:05:16,174 - src.data_processor - INFO - Processing posts...
+2024-11-12 20:05:29,653 - src.data_processor - INFO - Processing comments...
+2024-11-12 20:05:29,654 - src.data_processor - INFO - Creating conversation pairs...
+2024-11-12 20:05:29,654 - src.data_processor - WARNING - No conversation pairs available. Skipping train/test split and save.
+2024-11-12 20:05:29,654 - src.data_processor - INFO - Processing completed successfully!
+2024-11-12 20:05:29,654 - src.data_processor - INFO - Number of conversation pairs: 0
+2024-11-12 20:05:29,829 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: mps
+2024-11-12 20:05:29,829 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-mpnet-base-v2
+2024-11-12 20:05:33,470 - src.nlp.analyzer - INFO - Cluster 4: ['80', 'eq', 'morning wood', 'sometimes', 'wood']
+2024-11-12 20:05:33,470 - src.nlp.analyzer - INFO - Cluster 2: ['gains', 'girth', 'inches', 'length', 'pump']
+2024-11-12 20:05:33,470 - src.nlp.analyzer - INFO - Cluster 5: ['7hg', 'fine', 'mustang', 'mustang tube', 'newbee']
+2024-11-12 20:05:33,470 - src.nlp.analyzer - INFO - Cluster 0: ['2023', '2023 gained', 'comment', 'comment 2023', 'gained']
+2024-11-12 20:05:33,470 - src.nlp.analyzer - INFO - Cluster 1: ['after', 'seems', 'seems like', 'sub', 'sub seems']
+2024-11-12 20:05:33,470 - src.nlp.analyzer - INFO - Cluster 3: ['angle', 'hanging', 'is', 'is btc', 'recently']
+2024-11-12 20:05:41,637 - __main__ - INFO - Processing statistics:
+2024-11-12 20:05:41,638 - __main__ - INFO - - total_posts: 11
+2024-11-12 20:05:41,638 - __main__ - INFO - - total_comments: 10
+2024-11-12 20:05:41,638 - __main__ - INFO - - gpu_available: False
+2024-11-12 20:05:41,638 - __main__ - INFO - - gpu_name: None
+2024-11-12 20:05:41,638 - __main__ - INFO - - batch_size: 128
+2024-11-12 20:05:41,638 - __main__ - INFO - - chunk_size: 1000
+2024-11-12 20:05:41,638 - __main__ - INFO - - posts_with_comments: 0
