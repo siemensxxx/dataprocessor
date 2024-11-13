@@ -121,21 +121,26 @@ class RedditDataAnalyzer:
         # Join the filtered words back into a single string
         text = " ".join(filtered_words)
         
+        # Early return if the filtered text is empty
         if not text.strip():  # Check if the filtered text is empty
             print("Filtered text is empty, skipping TF-IDF processing.")
             return []  # Return an empty list if filtered text is empty
         
         # Apply TF-IDF Vectorization
         vectorizer = TfidfVectorizer(ngram_range=(1, 2), max_features=5)
-        tfidf_matrix = vectorizer.fit_transform([text])
         
-        feature_names = vectorizer.get_feature_names_out()
-        phrase_scores = tfidf_matrix.toarray()[0]
-        
-        # Get key phrases with a non-zero score
-        key_phrases = [phrase for phrase, score in zip(feature_names, phrase_scores) if score > 0]
-        
-        return key_phrases
+        try:
+            tfidf_matrix = vectorizer.fit_transform([text])
+            feature_names = vectorizer.get_feature_names_out()
+            phrase_scores = tfidf_matrix.toarray()[0]
+            
+            # Get key phrases with a non-zero score
+            key_phrases = [phrase for phrase, score in zip(feature_names, phrase_scores) if score > 0]
+            
+            return key_phrases
+        except Exception as e:
+            print(f"Error during TF-IDF processing: {e}")
+            return []
 
     def analyze_conversation_tree(self, post_id: str):
         tree = self.conversation_trees.get(post_id)
